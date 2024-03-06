@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option csharp_namespace = "PLANetary.Communication.Protobuf";
+
+import "query.proto";
+import "identifier.proto";
+
+message QueryBroadcast {   
+   NodeId parentId = 1;
+   uint32 distanceToSink = 2;
+   bool parentIsPartOfQuery = 3;
+
+   Query query = 4;
+}

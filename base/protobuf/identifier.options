@@ -1,0 +1,8 @@
+#Identifier.uniqueId			max_size:16
+#Identifier.shortId				int_size:8
+# name is max. 8 characters + 0 byte
+Identifier.name					max_size:9
+
+QueryId.shortId				int_size:8
+
+NodeId.shortId				int_size:16

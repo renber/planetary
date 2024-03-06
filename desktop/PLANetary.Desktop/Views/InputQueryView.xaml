@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="PLANetary.Views.InputQueryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:int="clr-namespace:PLANetary.Interaction"
+             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"             
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Query Command in PLANetaryQL:" />
+        <Border Grid.Row="1" CornerRadius="2" Padding="2" BorderThickness="1">
+            <Border.Background>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColor}}" />
+            </Border.Background>
+            <Border.BorderBrush>
+                <SolidColorBrush Color="#FF888888" />
+                <!-- BorderMediumColor-->
+            </Border.BorderBrush>
+
+            <avalonEdit:TextEditor Height="200" WordWrap="True" SyntaxHighlighting="PlanetaryQL" FontSize="15" FontFamily="Lucida Console">
+                <i:Interaction.Behaviors>
+                    <int:AvalonEditBehaviour BindableText="{Binding QueryText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </i:Interaction.Behaviors>
+            </avalonEdit:TextEditor>
+        </Border>
+        <TextBlock Grid.Row="2" Text="{Binding ParserErrorText}" Foreground="DarkRed"/>
+        
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="1" Content="Execute" Command="{Binding ExecuteQueryCommand}" Width="100" Margin="0 0 5 0" />
+            <Button Grid.Column="2" Content="Clear Input" Command="{Binding ClearQueryTextCommand}" Width="100" />
+        </Grid>               
+    </Grid>
+</UserControl>

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option csharp_namespace = "PLANetary.Communication.Protobuf";
+
+import "identifier.proto";
+
+message ConditionGroup {
+	ConditionLink conditionLink = 1;
+	repeated Condition conditions = 2;
+}
+
+message Condition {
+	Identifier identifier = 1;
+	ValueOperator op = 2;
+	float value = 3;
+}
+
+enum ConditionLink {
+   AND = 0;
+   OR = 1;
+}
+
+enum ValueOperator {
+   EQUAL = 0;
+   GREATER = 1;
+   GREATER_OR_EQUAL = 2;
+   LESS = 3;
+   LESS_OR_EQUAL = 4;
+   NOT = 5;
+}

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option csharp_namespace = "PLANetary.Communication.Protobuf";
+
+import "identifier.proto";
+import "condition.proto";
+
+message Query {   
+   QueryId queryId = 1;    
+
+   // if this is a periodic query, a period is given here
+   uint32 periodInSec = 2;
+
+   // query (execution) conditions
+   ConditionLink conditionGroupLink = 3;   
+   repeated ConditionGroup conditionGroups = 4;
+
+   // definitions what to do, when the query conditions are met
+   // i.e.
+   // (1) selections to execute when the conditions are met (these will be sent back to the sink)
+   // (2) actor functions to call when the conditions are met
+   // (3) events to raise when the conditions are met
+   repeated Action actions = 5;
+}
+
+message Action {   
+   oneof content {
+      Selector selector = 1;
+      Actor actor = 2;
+      Event event = 3;
+   }
+}
+
+// used to identify the content-type of an Action
+enum ActionType {
+   NONE = 0;
+   SELECTOR = 1;
+   ACTOR = 2;
+   EVENT = 3;
+}
+
+message Selector {
+   SelectorType type = 1;
+   Identifier sensorId = 2;
+}
+
+message Actor {
+   Identifier actorId = 1;
+   uint32 param = 2;
+}
+
+message Event {
+   Identifier eventId = 1;
+}
+
+enum SelectorType {
+   SINGLE = 0;
+   SUM = 1;
+   MAX = 2;
+   MIN = 3;
+   AVG = 4;
+   COUNT = 5;
+   GROUP_BY = 6;
+}

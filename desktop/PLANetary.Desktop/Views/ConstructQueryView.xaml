@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="PLANetary.Views.ConstructQueryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ext="clr-namespace:PLANetary.Extensions"
+             xmlns:conv="clr-namespace:PLANetary.ValueConverters"
+             mc:Ignorable="d">
+    <ext:AutoGrid Columns="*,Auto,*" RowCount="3">
+        <DockPanel>
+            <TextBlock Text="Available sensors:" DockPanel.Dock="Top" />
+            <ListBox x:Name="availableSensorsListBox" ItemsSource="{Binding Path=AvailableSensors}" DisplayMemberPath="Name" Margin="10 5 0 0" />
+        </DockPanel>
+
+        <ext:AutoGrid Margin="20" ColumnCount="1" Rows="*,Auto,Auto,Auto,*">
+            <TextBlock Text="Aggregation function:" />
+            <ComboBox x:Name="selectionFunctionComboBox" ItemsSource="{Binding Path=AvailableSelectionFunctions}" Margin="10 5 0 0" />
+            <Button Content=">>>" HorizontalAlignment="Right" Padding="10 0" Margin="0 5 0 0" Command="{Binding Path=AddValueSelectionCommand}">
+                <Button.Resources>
+                    <conv:AddValueSelectionCommandParametersConverter x:Key="addValueSelectionParamConv" />
+                </Button.Resources>
+                <!-- Parameters for the add ValueSelection command-->
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource addValueSelectionParamConv}">
+                        <MultiBinding.Bindings>
+                            <Binding ElementName="availableSensorsListBox" Path="SelectedItem" />
+                            <Binding ElementName="selectionFunctionComboBox" Path="SelectedItem" />
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+        </ext:AutoGrid>
+
+        <ext:AutoGrid Rows="*,Auto" ColumnCount="1" >
+            <DockPanel>
+                <TextBlock Text="Selected sensors:" DockPanel.Dock="Top" />
+                <ListBox x:Name="selectedSensorsListBox" ItemsSource="{Binding Path=SelectedSensors}" DisplayMemberPath="Name" Margin="10 5 0 0" />
+            </DockPanel>
+
+            <Button HorizontalAlignment="Right" Content="Delete" Padding="10 0" Margin="0 5 0 0" Command="{Binding Path=RemoveValueSelectionCommand}" CommandParameter="{Binding ElementName=selectedSensorsListBox, Path=SelectedItem}" />
+        </ext:AutoGrid>
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="3">
+            <GroupBox Header="Conditions (conjunctive combination)">
+
+                <ext:AutoGrid Rows="*,Auto" ColumnCount="1">
+                    <ListView ItemsSource="{Binding Path=QueryConditions}" SelectionMode="Single">
+                        <ListView.Resources>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Control.Focusable" Value="False"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected"
+                                         Value="True">
+                                        <Setter Property="Background"
+                                                Value="{x:Null}" />
+                                        <Setter Property="BorderBrush"
+                                                Value="{x:Null}" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{x:Null}" />
+                                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                                    </Trigger>
+                                </Style.Triggers>                                
+                            </Style>
+                        </ListView.Resources>
+
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Sensor" Width="250">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding Path=DataContext.AvailableSensors, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView, AncestorLevel=1}}" SelectedItem="{Binding Sensor, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Condition" Width="80">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding Path=DataContext.AvailableOperators, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView, AncestorLevel=1}}" SelectedItem="{Binding Operator, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Value" Width="80">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Mode=TwoWay, Path=Value, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="" Width="70">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Remove" Padding="5 0" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ListView, AncestorLevel=1}, Path=DataContext.RemoveQueryConditionCommand}" CommandParameter="{Binding .}" />
+                                            </StackPanel>
+
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <Button Margin="0 5 0 0" Content="Add condition" Command="{Binding Path=AddQueryConditionCommand}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10 0"/>
+                </ext:AutoGrid>
+            </GroupBox>
+        </Grid>
+
+        <ext:AutoGrid Columns="*,Auto,Auto" RowCount="1" Grid.ColumnSpan="3">
+            <ext:SkipCell />
+            <Button Content="Execute" Padding="5 2" Margin="0 0 5 0" Command="{Binding ExecuteQueryCommand}" />
+            <Button Content="Reset inputs" Padding="5 2" Command="{Binding ResetCommand}" />
+        </ext:AutoGrid>
+    </ext:AutoGrid>
+</UserControl>

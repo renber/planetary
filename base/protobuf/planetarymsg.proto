@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option csharp_namespace = "PLANetary.Communication.Protobuf";
+
+import "querybroadcast.proto";
+import "queryparentsel.proto";
+import "resultset.proto";
+import "cancelquery.proto";
+
+// general planetary message which contains one of the actual content messages
+
+message PlanetaryMessage {   
+   oneof payload {      
+      QueryBroadcast broadcast = 1;
+      QueryParentSel parentsel = 2;
+      Resultset resultset = 3;
+      CancelQueryMessage cancelquery = 4;
+   }
+}

@@ -1,0 +1,7 @@
+
+Resultset.queryId			max_size:16
+
+Resultset.rows	            max_count:20
+
+ResultRow.values            max_count:10
+

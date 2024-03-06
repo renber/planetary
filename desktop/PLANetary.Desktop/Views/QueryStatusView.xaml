@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="PLANetary.Views.QueryStatusView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PLANetary.Extensions"             
+             xmlns:views="clr-namespace:PLANetary.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="200" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <ListView x:Name="queryList" ItemsSource="{Binding RunningQueries}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Query ID" Width="60" DisplayMemberBinding="{Binding QueryID}" />
+                    <GridViewColumn Header="Type" Width="120" DisplayMemberBinding="{Binding QueryType}" />
+                    <GridViewColumn Header="Status" Width="120" DisplayMemberBinding="{Binding StateStr}" />
+                    <GridViewColumn Header="Received Resultsets" Width="120" DisplayMemberBinding="{Binding ResultCount}" />
+                    <GridViewColumn Header="Last result at" Width="120" DisplayMemberBinding="{Binding LastResultTimeText}" />
+                    <GridViewColumn Header="Execution Time" Width="120" DisplayMemberBinding="{Binding ExecutionTime}" />
+                    <GridViewColumn Header="Query text" Width="300" DisplayMemberBinding="{Binding SqlText}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        
+        <StackPanel Grid.Row="1">
+            <Button Content="Remove finished queries" HorizontalAlignment="Right" Padding="10 0" Margin="0 5 0 0" Command="{Binding RemoveFinishedQueriesCommand}" />
+        </StackPanel>
+
+        <GroupBox Grid.Row="2" Header="Details" DataContext="{Binding ElementName=queryList, Path=SelectedItem}" IsEnabled="{Binding ElementName=queryList, Path=SelectedItem, FallbackValue=True, TargetNullValue=False}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />                    
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <TextBlock Text="PLANetaryQL command:" />
+                <TextBox Grid.Row="1" AcceptsReturn="True" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="#FFD7D7D7" IsEnabled="True" Text="{Binding SqlText, Mode=OneWay}" />
+
+                <StackPanel Grid.Row="2">
+                    <Button Content="Abort" HorizontalAlignment="Right" Padding="10 0" Margin="0 5"  Command="{Binding ElementName=queryList, Path=DataContext.CancelQueryCommand}" CommandParameter="{Binding ElementName=queryList, Path=SelectedItem}" Visibility="{Binding IsFinished, Converter={StaticResource boolToVisibilityConv}, ConverterParameter=invert}" />
+                </StackPanel>
+
+                <TextBlock Grid.Row="3" Text="Results:" />
+
+                <TabControl Grid.Row="4">
+                    <TabItem Header="Tabular">
+                        <views:QueryResultTableView />
+                    </TabItem>
+
+                    <TabItem Header="Chart">
+                        <views:QueryResultChartView />
+                    </TabItem>
+                </TabControl>                
+
+            </Grid>
+        </GroupBox>
+        
+    </Grid>
+</UserControl>

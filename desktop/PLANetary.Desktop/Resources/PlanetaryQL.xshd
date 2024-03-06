@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SyntaxDefinition name="PlanetaryQL"
+        xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="Green" />
+  <Color name="String" foreground="Blue" />
+
+  <!-- This is the main ruleset. -->
+  <RuleSet ignoreCase="true">
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true"
+
+       begin="/\*" end="\*/" />
+
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- nested span for escape sequences -->
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <Keywords fontWeight="bold" foreground="Black">
+      <Word>SENSE</Word>
+      <Word>THEN</Word>
+      <Word>ACT</Word>
+      <Word>RAISE</Word>
+      <Word>AT</Word>
+      <Word>WHERE</Word>
+      <Word>AND</Word>
+      <Word>OR</Word>
+      <Word>GROUP BY</Word>
+      <Word>EVERY</Word>
+      <Word>FOR</Word>
+    </Keywords>
+
+    <!-- common func names -->
+    <Keywords foreground="Blue">
+      <Word>min</Word>
+      <Word>max</Word>
+      <Word>sum</Word>
+      <Word>avg</Word>
+      <Word>count</Word>
+    </Keywords>
+
+    <!-- Digits -->
+    <Rule foreground="Red">
+      \b0[xX][0-9a-fA-F]+  # hex number
+      |    \b
+      (    \d+(\.[0-9]+)?   #number with optional floating point
+      |    \.[0-9]+         #or just starting with floating point
+      )
+      ([eE][+-]?[0-9]+)? # optional exponent
+    </Rule>
+
+    <!-- event names -->
+    <Rule foreground="Green">
+      evt'(\S+)\s?
+    </Rule>
+    
+    <!-- funcs -->
+    <Rule foreground="Blue">
+      (\S+)\s*\(
+    </Rule>
+
+    <!-- opening bracket -->
+    <Rule foreground="Blue">
+      \(
+    </Rule>
+    
+    <!-- closing bracket -->    
+    <Rule foreground="Blue">
+      \)
+    </Rule>
+    
+    <!-- other names -->
+    <!--<Rule foreground="Black">
+      \b\w+\b
+    </Rule>-->
+
+    
+  </RuleSet>
+</SyntaxDefinition>

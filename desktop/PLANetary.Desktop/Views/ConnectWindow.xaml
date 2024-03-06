@@ -1,0 +1,38 @@
+﻿<Window x:Class="PLANetary.Views.ConnectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ext="clr-namespace:PLANetary.Extensions"
+        xmlns:local="clr-namespace:PLANetary.Views"
+        mc:Ignorable="d"
+        Title="Connect to a Planetary Network" Width="800" SizeToContent="Height" WindowStartupLocation="CenterOwner">
+    <ext:AutoGrid Columns="*" RowCount="3" ChildMargin="0 0 0 20" Margin="5 5 5 -15">
+
+        <ext:AutoGrid ColumnCount="2" ChildMargin="0 0 20 0">
+            <Image Source="/Images/planetary_logo.png" Margin="5" Stretch="None" />
+            <TextBlock VerticalAlignment="Center">
+                <Run Text="Welcome to Planetary" FontSize="24" FontWeight="Bold" />
+                <LineBreak />
+                <Run Text="Please select how you want to connect to the sensor network" />
+            </TextBlock>
+        </ext:AutoGrid>
+
+        <GroupBox Header="Connectors" Padding="5">
+            <ext:AutoGrid Columns="Auto,Auto,*" MinHeight="100" Rows="*">
+                <ListBox ItemsSource="{Binding ConnectionTypes}" SelectedItem="{Binding SelectedConnectionType}" DisplayMemberPath="Title" MinWidth="160" MinHeight="60" />
+
+                <TextBlock Text="&gt;&gt;" VerticalAlignment="Center" Margin="5 0" />
+
+                <ContentPresenter Content="{Binding SelectedConnectionType}" ContentTemplateSelector="{StaticResource connectionParamsTemplateSelector}" Margin="10 0 0 0" VerticalAlignment="Center" />
+            </ext:AutoGrid>
+        </GroupBox>
+
+        <ext:AutoGrid Columns="*,Auto,Auto" Grid.ColumnSpan="2">
+            <ext:SkipCell />
+            <Button Content="Connect" Command="{Binding ConnectCommand}" FontSize="16" Padding="10 5" Margin="0 0 5 0" MinWidth="200" />
+            <Button Content="Close" Command="{Binding CancelCommand}" FontSize="16" Padding="10 5" MinWidth="200" />
+        </ext:AutoGrid>
+        
+    </ext:AutoGrid>
+</Window>

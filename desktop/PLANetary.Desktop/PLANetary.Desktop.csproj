@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{13CB55D6-9A7C-45EC-9D14-73B77C6DBA75}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PLANetary</RootNamespace>
+    <AssemblyName>PLANetary.Desktop</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Logo.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FontAwesome.Sharp, Version=5.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesome.Sharp.5.2.0\lib\net40\FontAwesome.Sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf, Version=3.6.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.6.0\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.3.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\packages\AvalonEdit.5.0.4\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Expression.Blend.Sdk.WPF.1.0.1\lib\net45\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
+    <Reference Include="PLANetaryQL.Parser, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\planetaryql_dotnet\PLANetaryQL.Parser\bin\Debug\PLANetaryQL.Parser.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Expression.Blend.Sdk.WPF.1.0.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Extensions\AutoGrid.cs" />
+    <Compile Include="Extensions\DependencyExtensions.cs" />
+    <Compile Include="Extensions\GridViewColumns.cs" />
+    <Compile Include="Extensions\TreeViewItemExtensions.cs" />
+    <Compile Include="Extensions\SynchronizedObservableCollection.cs" />
+    <Compile Include="Interaction\AvalonEditBehavior.cs" />
+    <Compile Include="Interaction\ConnectionParamsTemplateSelector.cs" />
+    <Compile Include="Interaction\DefaultViewTemplateSelector.cs" />
+    <Compile Include="Interaction\RelayCommand.cs" />
+    <Compile Include="Services\DefaultDialogService.cs" />
+    <Compile Include="Services\IChartDataFactory.cs" />
+    <Compile Include="Services\IDialogService.cs" />
+    <Compile Include="Services\LVCChartDataFactory.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Types\ColorUtils.cs" />
+    <Compile Include="Types\RGBColor.cs" />
+    <Compile Include="Types\Statistics\IChartData.cs" />
+    <Compile Include="Types\QueryCreatedEventArgs.cs" />
+    <Compile Include="Types\Statistics\StatSeries.cs" />
+    <Compile Include="ValueConverters\AddValueSelectionCommandParametersConverter.cs" />
+    <Compile Include="ValueConverters\BoolInverterConverter.cs" />
+    <Compile Include="ValueConverters\BoolToBrushConverter.cs" />
+    <Compile Include="ValueConverters\BoolToVisibilityConverter.cs" />
+    <Compile Include="ValueConverters\IndexToNumberConverter.cs" />
+    <Compile Include="ValueConverters\LeftMarginMultiplierConverter.cs" />
+    <Compile Include="ViewModels\Connection\ConnectViewModel.cs" />
+    <Compile Include="ViewModels\InputQueryViewModel.cs" />
+    <Compile Include="ViewModels\Navigation\NavigationElement.cs" />
+    <Compile Include="ViewModels\Queries\ActuatorViewModel.cs" />
+    <Compile Include="ViewModels\Visualization\ChartAxisViewModel.cs" />
+    <Compile Include="ViewModels\Visualization\ChartSeriesViewModel.cs" />
+    <Compile Include="ViewModels\Queries\ConditionOperatorViewModel.cs" />
+    <Compile Include="ViewModels\Connection\Parameters\ConnectionParamsViewModel.cs" />
+    <Compile Include="ViewModels\Connection\Parameters\NullConnectionParamsViewModel.cs" />
+    <Compile Include="ViewModels\Connection\Parameters\SerialConnectionParamsViewModel.cs" />
+    <Compile Include="ViewModels\Connection\Parameters\UdpConnectionParamsViewModel.cs" />
+    <Compile Include="ViewModels\ConstructQueryViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\Queries\QueryConditionViewModel.cs" />
+    <Compile Include="ViewModels\Queries\QueryResultRowViewModel.cs" />
+    <Compile Include="ViewModels\ResultsetViewModel.cs" />
+    <Compile Include="ViewModels\QueryViewModel.cs" />
+    <Compile Include="ViewModels\SelectionFunctionViewModel.cs" />
+    <Compile Include="ViewModels\Queries\SensorValueViewModel.cs" />
+    <Compile Include="ViewModels\Queries\SensorViewModel.cs" />
+    <Compile Include="ViewModels\Queries\ValueSelectionViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="ViewModels\Visualization\LVCChartData.cs" />
+    <Compile Include="ViewModels\WindowedViewModelBase.cs" />
+    <Compile Include="Views\Connection\NoConnectionParamsControl.xaml.cs">
+      <DependentUpon>NoConnectionParamsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Connection\SerialConnectionParamsControl.xaml.cs">
+      <DependentUpon>SerialConnectionParamsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Connection\UdpConnectionParamsControl.xaml.cs">
+      <DependentUpon>UdpConnectionParamsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ConnectWindow.xaml.cs">
+      <DependentUpon>ConnectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ConstructQueryView.xaml.cs">
+      <DependentUpon>ConstructQueryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InputQueryView.xaml.cs">
+      <DependentUpon>InputQueryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\QueryResultChartView.xaml.cs">
+      <DependentUpon>QueryResultChartView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\QueryResultTableView.xaml.cs">
+      <DependentUpon>QueryResultTableView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\QueryStatusView.xaml.cs">
+      <DependentUpon>QueryStatusView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\QueryView.xaml.cs">
+      <DependentUpon>QueryView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Views\Connection\NoConnectionParamsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Connection\SerialConnectionParamsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Connection\UdpConnectionParamsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ConnectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ConstructQueryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InputQueryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\QueryResultChartView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\QueryResultTableView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\QueryStatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\QueryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <Resource Include="Resources\PlanetaryQL.xshd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PLANetary.Communication\PLANetary.Communication.csproj">
+      <Project>{0285472E-33B3-4965-86AF-2FA26F248BCC}</Project>
+      <Name>PLANetary.Communication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PLANetary.Core\PLANetary.Core.csproj">
+      <Project>{a355aee7-07e9-4b87-908c-4ee8e9d670ba}</Project>
+      <Name>PLANetary.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\planetary_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\types.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Highlighting\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="PLANetary.Views.Connection.SerialConnectionParamsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PLANetary.Views.Connection"
+             mc:Ignorable="d">
+    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5 0">
+        <TextBlock Text="Connect over this port: " VerticalAlignment="Center" />
+        <ComboBox ItemsSource="{Binding SerialPorts}" SelectedItem="{Binding SelectedSerialPort}"  Width="120" Margin="5 0 0 0" />    
+    </StackPanel>
+</UserControl>

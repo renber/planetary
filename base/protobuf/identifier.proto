@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option csharp_namespace = "PLANetary.Communication.Protobuf";
+
+// a unique identifier for sensors, actors and events
+// can be a UUID or a name
+message Identifier {
+   // required bytes uniqueId = 1;
+   //uint32 shortId = 1;
+   string name = 1;
+}
+
+// a unique identifier for queries
+message QueryId {
+   uint32 shortId = 1;
+}
+
+// a unique identifier for (sensor) nodes
+message NodeId {   
+   uint32 shortId = 1;
+}
+
+// todo: add support for UIDs
+/*
+message Identifier {
+   oneof {
+      uint32 shortId = 1;
+      oneof {
+		bytes uniqueId = 2;
+		string name = 3;
+      }      
+   }   
+}
+*/

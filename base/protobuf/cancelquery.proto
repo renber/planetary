@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option csharp_namespace = "PLANetary.Communication.Protobuf";
+
+import "identifier.proto";
+
+message CancelQueryMessage {
+	// the id of the query which should be cancelled
+	QueryId queryId = 1;   
+}

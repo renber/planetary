@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "PLANetary.Communication.Protobuf";
+
+import "identifier.proto";
+
+message Resultset {
+	// the id of the query to which this resultset belongs to
+	QueryId queryId = 1;   	
+
+	repeated ResultRow rows = 2;
+}
+
+message ResultRow {
+	uint32 numberOfNodes = 1;
+
+	// the values (i.e. columns for this row)
+	repeated float values = 2;
+}
+
+// TODO: support for string datatype
+/*message SensorValue {
+	oneof value {
+		string strValue;
+		float floatValue;
+	}
+}*/

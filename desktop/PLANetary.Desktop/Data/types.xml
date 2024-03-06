@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<planetary>
+	<sensors>
+		<sensor id="id" />
+		<sensor id="temp" name="Temperature" />
+		<sensor id="randno" name="Random number" />
+		<sensor id="nodesel" name="Node selection" />
+	</sensors>
+	<actuators>
+		<actuator id="blink" name="BLINK" param="1" /> 
+	</actuators>
+</planetary>

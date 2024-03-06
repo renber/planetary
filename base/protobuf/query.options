@@ -1,0 +1,5 @@
+
+Query.conditionGroups	max_count:4
+Query.actions			max_count:10
+
+Actor.param				int_size:32
