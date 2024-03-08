@@ -1,6 +1,6 @@
-# ![PLANetary logo](https://www.tu-chemnitz.de/~berre/images/planetary_logo_small.png)  PLANetary core
+# ![Planetary logo](https://www.tu-chemnitz.de/~berre/images/planetary_logo_small.png)  PLANetary core
 
-The core files of the PLANetary library in C for embedded, resource-limited sensor nodes.
+The core files of the Planetary library in C for embedded, resource-limited sensor nodes.
 
 PLANetary is a querying system for wireless sensor networks (WSN) which allows the user or services to pose queries in a SQL-like format to a WSN which are the answered by this network in an energy efficient way. This enables a high flexibility of the WSN towards changing requirements and use-cases as well as an energy-efficient oepration.
 
@@ -15,16 +15,12 @@ Initialization:
 ```c
 #include <stdio.h>
 #include <stdlib.h>
-#include "querytypes.h"
-#include "queries.h"
+#include "planetary/querytypes.h"
+#include "planetary/queries.h"
 
-int main()
+void init()
 {
-    printf("Welcome to PLANetary\n");
-
     QueryCore pCore;
     initQueryCore(&pCore);
-
-    return 0;
 }
 ```
