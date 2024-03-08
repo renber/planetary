@@ -9,6 +9,14 @@
 **/
 
 CuSuite* EncodingGetSuite();
+CuSuite* GroupingGetSuite();
+CuSuite* QueryCoreGetSuite();
+CuSuite* StoreGetSuite();
+CuSuite* FrugalGetSuite();
+CuSuite* MemoryGetSuite();
+CuSuite* SpaceSavingGetSuite();
+CuSuite* LinearCountingGetSuite();
+
 
 void RunAllTests(void) {
     srand(time(NULL)); // needed by some tests
@@ -16,9 +24,15 @@ void RunAllTests(void) {
     CuString *output = CuStringNew();
     CuSuite* suite = CuSuiteNew();
 
-    CuSuiteAddSuite(suite, EncodingGetSuite());  	
-	CuSuiteAddSuite(suite, GroupingGetSuite());	
-	CuSuiteAddSuite(suite, QueryCoreGetSuite());	
+	
+    CuSuiteAddSuite(suite, EncodingGetSuite());
+	CuSuiteAddSuite(suite, GroupingGetSuite());
+	CuSuiteAddSuite(suite, QueryCoreGetSuite());
+	CuSuiteAddSuite(suite, StoreGetSuite());
+	CuSuiteAddSuite(suite, FrugalGetSuite());
+	CuSuiteAddSuite(suite, MemoryGetSuite());
+	CuSuiteAddSuite(suite, SpaceSavingGetSuite());
+	CuSuiteAddSuite(suite, LinearCountingGetSuite());
 
     CuSuiteRun(suite);
     CuSuiteSummary(suite, output);

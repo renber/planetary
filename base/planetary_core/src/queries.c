@@ -1,5 +1,6 @@
 
 #include <string.h>
+#include <stdlib.h>
 
 #include <planetary/queries.h>
 #include <planetary/dummy_callbacks.h>
@@ -9,6 +10,7 @@
 
 #include <planetary/proto/planetarymsg.pb.h>
 #include <planetary/proto/resultset.pb.h>
+#include <planetary/stores.h>
 
 void initQueryCore(QueryCore* core, NodeId nodeId, enum APPMODE mode)
 {
@@ -19,7 +21,8 @@ void initQueryCore(QueryCore* core, NodeId nodeId, enum APPMODE mode)
 	for (i = 0; i < MAX_RUNNING_QUERIES; i++)
 		core->queries[i].state = STATE_UNUSED;
 
-    queueInit(&(core->packetQueue));    
+    queueInit(&(core->packetQueue));   
+	initDefaultStoreCoreCollection(&(core->storeCollection));
 
     // assign dummy functions (to avoid null ptr exceptions)
     core->getSensorValue = getSensorValue_dummy;
@@ -44,10 +47,14 @@ int getActiveQueryCount(QueryCore* core)
 
 int findRunningQuery(QueryCore* core, QueryId query_id)
 {
-    int i;
-  for(i = 0; i < MAX_RUNNING_QUERIES; i++)
-   if (core->queries[i].state != STATE_UNUSED && core->queries[i].id.shortId == query_id.shortId)
-    return i;
+	int i;
+	for (i = 0; i < MAX_RUNNING_QUERIES; i++)
+	{
+		if (core->queries[i].state != STATE_UNUSED && core->queries[i].id.shortId == query_id.shortId)
+		{
+			return i;
+		}
+	}
 
   return -1;
 }
@@ -92,12 +99,14 @@ bool advanceQueryCore(QueryCore* core, int ticks)
     int r;
     for(r = 0; r < MAX_RUNNING_QUERIES; r++)
     {
-		if (queries[r].state == STATE_PARENT_SELECTION)
+		QuerySlot* q = &queries[r];
+
+		if (q->state == STATE_PARENT_SELECTION)
 		{
-			queries[r].stateWaitTime -= ticks;
-			if (queries[r].stateWaitTime <= 0)
+			q->stateWaitTime -= ticks;
+			if (q->stateWaitTime <= 0)
 			{
-				// inform our to-be-parent the information that we chose them as parent node for this query
+				// inform our to-be-parent that we chose them as parent node for this query
 				if (core->mode == AM_NODE) { // the sink does not need a parent
 					informQueryParent(core, &queries[r]);
 				}
@@ -107,31 +116,31 @@ bool advanceQueryCore(QueryCore* core, int ticks)
 				changes = true;
 
 				// PARENT SELECTION PHASE has finished, we are now rebroadcasting the query to find children
-				queries[r].stateWaitTime = BROADCAST_WAIT_TIME;
-				queries[r].state = STATE_FIND_CHILDREN;
+				q->stateWaitTime = BROADCAST_WAIT_TIME;
+				q->state = STATE_FIND_CHILDREN;
 			}
 		} else
-		if (queries[r].state == STATE_FIND_CHILDREN)
+		if (q->state == STATE_FIND_CHILDREN)
 		{
-			queries[r].stateWaitTime -= ticks;
-			if (queries[r].stateWaitTime <= 0)
+			q->stateWaitTime -= ticks;
+			if (q->stateWaitTime <= 0)
 			{
 				// BROADCASTING PHASE has finished, we are now waiting for child results
 				// or finish the query right away if there are no children				
-				queries[r].state = STATE_WAIT_FOR_RESULTS;
+				q->state = STATE_WAIT_FOR_RESULTS;				
 			}
 		}
 
-        if (queries[r].state == STATE_WAIT_FOR_RESULTS)
+        if (q->state == STATE_WAIT_FOR_RESULTS)
         {
-            if (queries[r].periodic && queries[r].queryChildren_count == 0 && queries[r].nextRoundIn > 0)
+            if (q->periodic && q->queryChildren_count == 0 && q->nextRoundIn > 0)
             {
-                queries[r].nextRoundIn -= ticks;
-                if (queries[r].nextRoundIn < 0)
-                    queries[r].nextRoundIn = 0;
+                q->nextRoundIn -= ticks;
+                if (q->nextRoundIn < 0)
+                    q->nextRoundIn = 0;
             }
 
-			if (queries[r].remainingResults == 0 || (queries[r].periodic && queries[r].nextRoundIn == 0))
+			if (((q->queryChildren_count > 0 || !q->periodic) && q->remainingResults == 0) || (q->queryChildren_count == 0 && q->periodic && q->nextRoundIn == 0))
             {
                 finishQuery(core, &queries[r]);
                 changes = true;
@@ -160,9 +169,75 @@ void addMyQueryResult(QueryCore *core, QuerySlot* query)
 
   for(i = 0; i < query->queryData.actions_count; i++)
   {
-	  if (query->queryData.actions[i].which_content == ActionType_SELECTOR) {
-		  query->resultset.rows[query->resultset.rows_count].values[i] = core->getSensorValue(core, query->queryData.actions[i].content.selector.sensorId);
-		  query->resultset.rows[query->resultset.rows_count].values_count++;
+	  if (query->queryData.actions[i].which_content == ActionType_SELECTOR) 
+	  {
+		  Identifier id;
+
+		  switch (query->queryData.resultTarget.which_target)
+		  {
+		  default:
+		  case TargetType_TARGETSINK:
+			  switch (query->queryData.actions[i].content.selector.which_source)
+			  {
+			  default:
+			  case SourceType_SOURCESENSOR:
+				  id = query->queryData.actions[i].content.selector.source.sensor.sensorId;
+				  query->resultset.rows[query->resultset.rows_count].values[i] = core->getSensorValue(core, id);
+				  query->resultset.rows[query->resultset.rows_count].values_count++;
+				  break;
+			  case SourceType_SOURCESTORE:
+			  {
+				  int index = 0;
+				  bool out_isFinished = false;
+				  strcpy(id.name, query->queryData.actions[i].content.selector.source.store.storeName);
+
+				  //since the while loop is always executed at least once, the rows_count value will be one bigger than needed. Hence the substraction at the beginning
+				  query->resultset.rows_count--;
+				  while (!out_isFinished)
+				  {
+					  query->resultset.rows_count++;
+					  query->resultset.rows[query->resultset.rows_count].numberOfNodes = 1; // the result set originates only from this node
+					  if (query->resultset.rows[query->resultset.rows_count].values_count >= MAX_QUERY_RESULTS)
+					  {
+						  query->resultset.rows[query->resultset.rows_count].values_count = 0;
+					  }
+					  float param = query->queryData.actions[i].content.selector.source.store.param;
+					  query->resultset.rows[query->resultset.rows_count].values[i] = readFromStore(&(core->storeCollection), id, param, index, &out_isFinished);
+					  query->resultset.rows[query->resultset.rows_count].values_count++;
+					  index++;
+				  }
+				  break;
+			  }
+			  }
+			  break;
+		  case TargetType_TARGETSTORE:
+			  switch (query->queryData.actions[i].content.selector.which_source)
+			  {
+			  default:
+			  case SourceType_SOURCESENSOR:
+				  strcpy(id.name, query->queryData.resultTarget.target.storeTarget.storeName);
+				  writeIntoStore(&(core->storeCollection), id, core->getSensorValue(core, id));
+				  break;
+			  case SourceType_SOURCESTORE:
+			  {
+				  int index = 0;
+				  bool out_isFinished = false;
+				  strcpy(id.name, query->queryData.actions[i].content.selector.source.store.storeName);
+				  float param = query->queryData.actions[i].content.selector.source.store.param;
+				  Identifier resultID = { query->queryData.resultTarget.target.storeTarget.storeName };
+
+
+				  while (!out_isFinished)
+				  {
+					  writeIntoStore(&(core->storeCollection), 
+						  resultID,
+						  readFromStore(&(core->storeCollection), id, param, index, &out_isFinished));
+					  index++;
+				  }
+			  }
+
+			  }
+		  }
 	  }
   }
 
@@ -173,6 +248,12 @@ void addMyQueryResult(QueryCore *core, QuerySlot* query)
   {
 	  if (query->queryData.actions[i].which_content == ActionType_ACTOR)
 		core->act(core, query->queryData.actions[i].content.actor.actorId, query->queryData.actions[i].content.actor.param);
+  }
+
+  for (i = 0; i < query->queryData.actions_count; i++) {
+	  if (query->queryData.actions[i].which_content == ActionType_STORE) {
+		  handleStoreMessage(&(core->storeCollection), &query->queryData.actions[i].content.store);
+	  }
   }
 }
 
@@ -192,29 +273,32 @@ void sendQueryResult(QueryCore* core, QuerySlot* query)
 // finishing a query
 void finishQuery(QueryCore* core, QuerySlot* query)
 {
-    // add this node's result line
-    addMyQueryResult(core, query);
-    // combine the existing results
-    #if ALLOW_GROUPING == 1
-    combineResults(query);
-    #endif
+	// add this node's result line
+	addMyQueryResult(core, query);
+	// combine the existing results
+#if ALLOW_GROUPING == 1
+	combineResults(query);
+#endif
 
-    query->state = STATE_DORMANT;
+	query->state = STATE_DORMANT;
+	sendQueryResult(core, query);
 
-  if (core->mode == AM_NODE)
-  {
-    // if we are a node send all results to the parent node
-    sendQueryResult(core, query);
-  } else
-  {
-    sendQueryResult(core, query);
+	/*
+	if (core->mode == AM_NODE)
+	{
+		// if we are a node send all results to the parent node
+		sendQueryResult(core, query);
+	}
+	else
+	{
+		sendQueryResult(core, query);
 
-    if (query->periodic)
-      awakeQuery(query);
-    else
-      // query finished
-      query->state = STATE_WAIT_FOR_RESULTS;
-  }
+		if (query->periodic)
+			awakeQuery(query);
+		else
+			// query finished
+			query->state = STATE_WAIT_FOR_RESULTS;
+	}*/
 }
 
 QuerySlot* scheduleQueryFromBroadcast(QueryCore* core, QueryBroadcast* queryBroadcast)
@@ -276,12 +360,14 @@ QuerySlot* scheduleQuery(QueryCore* core, Query* queryData)
 	
 	// copy query data to slo
 	slot->queryData = *queryData;	
+	core->queries[qidx];
 
 	slot->id = queryData->queryId;
 	slot->resultset.queryId = slot->id;
 	slot->resultset.rows_count = 0;
 
-	slot->periodic = slot->queryData.periodInSec > 0;	  
+	slot->periodic = slot->queryData.periodInSec > 0;
+	slot->nextRoundIn = slot->queryData.periodInSec * 1000;
 
 	slot->queryChildren_count = 0;	
 	slot->remainingResults = 0;
@@ -356,13 +442,15 @@ uint8 sendQueryToChildren(QueryCore* core, QuerySlot* query)
 // reactivates a dormant query
 void awakeQuery(QuerySlot* query)
 {
-  if (query->state = STATE_DORMANT && query->periodic)
+  if (query->state == STATE_DORMANT && query->periodic)
   {
         query->remainingResults = query->queryChildren_count;
-        if (query->queryChildren_count == 0)
-          query->nextRoundIn = query->queryData.periodInSec;
+		if (query->queryChildren_count == 0)
+		{
+			query->nextRoundIn = query->queryData.periodInSec * 1000;
+		}
         query->resultset.rows_count = 0; // reset results
-        query->state = STATE_WAIT_FOR_RESULTS;
+        query->state = STATE_WAIT_FOR_RESULTS;		
   }
 }
 

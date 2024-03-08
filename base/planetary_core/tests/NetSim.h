@@ -29,8 +29,8 @@ typedef struct NetSim_t {
 
 void initSim(NetSim* sim);
 
-// sends a query to the sink nod eof the simulation
-void querySim(NetSim* sim, Query* query);
+// sends a query to the sink node of the simulation
+bool querySim(NetSim* sim, Query* query);
 
 void advanceSim(NetSim* sim, int ticks);
 

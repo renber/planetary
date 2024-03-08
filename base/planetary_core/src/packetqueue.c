@@ -55,7 +55,7 @@ void queueNext(PacketQueue* queue)
     {
       if(p->what == PlanetaryMessage_resultset_tag)
       {
-          if (p->querySlot->state = STATE_DORMANT && p->querySlot->periodic)
+          if (p->querySlot->state == STATE_DORMANT && p->querySlot->periodic)
             awakeQuery(p->querySlot);
           else
             p->querySlot->state = STATE_UNUSED; // deactivate query as results have been sent

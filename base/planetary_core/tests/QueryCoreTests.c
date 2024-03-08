@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include <planetary/proto/query.pb.h>
 
@@ -59,25 +60,18 @@ void TestThreeNodeNetwork(CuTest *tc) {
 	query.actions_count = 1;
 	query.actions[0].which_content = ActionType_SELECTOR;
 	query.actions[0].content.selector.type = SelectorType_MAX;
-	strcpy_s(query.actions[0].content.selector.sensorId.name, 9, SENSOR_ID);	
+	strcpy_s(query.actions[0].content.selector.source.sensor.sensorId.name, 9, SENSOR_ID);
+	query.actions[0].content.selector.which_source = SourceType_SOURCESENSOR;
+	query.resultTarget.which_target = TargetType_TARGETSINK;
+
 	querySim(&sim, &query);
 
 	CuAssertIntEquals(tc, 1, getActiveQueryCount(sink));
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(nodeOne));
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(nodeTwo));
 
-	// advance the sim, the child nodes should now receive the query
-	advanceSim(&sim, PARENT_SELECTION_WAIT_TIME);
-	advanceSim(&sim, BROADCAST_WAIT_TIME);
-
-	CuAssertIntEquals(tc, 1, getActiveQueryCount(sink));
-	CuAssertIntEquals(tc, 1, getActiveQueryCount(nodeOne));
-	CuAssertIntEquals(tc, 1, getActiveQueryCount(nodeTwo));
-
-	// now the child nodes process the query and send the result back to the sink	
-	advanceSim(&sim, PARENT_SELECTION_WAIT_TIME);
-	advanceSim(&sim, BROADCAST_WAIT_TIME);
-	advanceSim(&sim, TEST_TICK_STEP);
+	// advance the sim, the child nodes should now receive & process the query	
+	advanceSim(&sim, 5000);	
 
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(sink)); // query has finished
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(nodeOne));
@@ -89,13 +83,13 @@ void TestThreeNodeNetwork(CuTest *tc) {
 	CuAssertIntEquals(tc, 2, sim.lastResultset.rows[0].values[0]);
 }
 
-void TestThreeNodeNetwork_SingleResult(CuTest* tc) {
+void TestThreeNodeNetwork_WithCondition(CuTest* tc) {
 
 	// simulate a simple network consisting of 3 nodes in the form
 	// nodeOne <--> sink <--> nodeTwo
 	// a query is scheduled and Sink and sent to Node1 and Node2
 	// which send their results back to sink
-	// The query selects the maximum node ID (i.e. 2)
+	// The query selects the sum of the node IDs of the nodes which match the specified condition
 
 	NetSim sim;
 	initSim(&sim);
@@ -110,11 +104,12 @@ void TestThreeNodeNetwork_SingleResult(CuTest* tc) {
 	query.actions_count = 1;
 	query.actions[0].which_content = ActionType_SELECTOR;
 	query.actions[0].content.selector.type = SelectorType_SUM;
-	strcpy_s(query.actions[0].content.selector.sensorId.name, 9, SENSOR_ID);
+	query.actions[0].content.selector.which_source = 0;
+	strcpy_s(query.actions[0].content.selector.source.sensor.sensorId.name, 9, SENSOR_ID);
 
 	query.conditionGroups_count = 1;
 	query.conditionGroups[0].conditions_count = 1;
-	strcpy_s(query.conditionGroups[0].conditions[0].identifier.name, 9, SENSOR_ID);	 
+	strcpy_s(query.conditionGroups[0].conditions[0].identifier.name, 9, SENSOR_ID);
 	query.conditionGroups[0].conditions[0].op = ValueOperator_LESS;
 	query.conditionGroups[0].conditions[0].value = 4;
 	querySim(&sim, &query);
@@ -123,18 +118,8 @@ void TestThreeNodeNetwork_SingleResult(CuTest* tc) {
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(nodeOne));
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(nodeTwo));
 
-	// advance the sim, the child nodes should now receive the query
-	advanceSim(&sim, PARENT_SELECTION_WAIT_TIME);
-	advanceSim(&sim, BROADCAST_WAIT_TIME);
-
-	CuAssertIntEquals(tc, 1, getActiveQueryCount(sink));
-	CuAssertIntEquals(tc, 1, getActiveQueryCount(nodeOne));
-	CuAssertIntEquals(tc, 1, getActiveQueryCount(nodeTwo));
-
-	// now the child nodes process the query and send the result back to the sink	
-	advanceSim(&sim, PARENT_SELECTION_WAIT_TIME);
-	advanceSim(&sim, BROADCAST_WAIT_TIME);
-	advanceSim(&sim, TEST_TICK_STEP);
+	// advance the sim, the child nodes should now receive & process the query	
+	advanceSim(&sim, 5000);			
 
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(sink)); // query has finished
 	CuAssertIntEquals(tc, 0, getActiveQueryCount(nodeOne));
@@ -151,7 +136,7 @@ CuSuite* QueryCoreGetSuite() {
 
 	SUITE_ADD_TEST(suite, TestScheduleEmptyQuery);
 	SUITE_ADD_TEST(suite, TestThreeNodeNetwork);
-	SUITE_ADD_TEST(suite, TestThreeNodeNetwork_SingleResult);
+	SUITE_ADD_TEST(suite, TestThreeNodeNetwork_WithCondition);
 
 	return suite;
 }

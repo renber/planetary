@@ -28,7 +28,7 @@ QueryCore* getSimNodeById(NetSim* sim, NodeId nodeId)
 	return NULL;
 }
 
-void querySim(NetSim* sim, Query* query)
+bool querySim(NetSim* sim, Query* query)
 {
 	if (sim->nodes_count > 0)
 	{
@@ -45,59 +45,66 @@ void querySim(NetSim* sim, Query* query)
 		if (!pb_encode(&stream, PlanetaryMessage_fields, &msg))
 			return false;
 		
-		handlePlanetaryPacket(&sim->nodes[0].queryCore, packetData, stream.bytes_written);
+		handlePlanetaryPacket(&sim->nodes[0].queryCore, packetData, stream.bytes_written);		
+
+		return true;
+	}
+
+	return false;
+}
+
+void processPackets(NetSim* sim, SimNode* node)
+{
+	unsigned char buf[NET_SIM_MAX_PACKET_LEN];
+
+	PacketQueue* curQueue = &node->queryCore.packetQueue;
+
+	while (!queueIsEmpty(curQueue))
+	{
+		// create packet
+		PacketToSend* p = queuePeekHead(curQueue);
+		int plen = createPlanetaryPacket(&node->queryCore, p, buf, NET_SIM_MAX_PACKET_LEN);
+		// directly inject the packet to the target node
+		if (p->noOfReceivers == SEND_BROADCAST)
+		{
+			for (int n = 0; n < node->neighbors_count; n++) {
+				QueryCore* targetNode = getSimNodeById(sim, node->neighbors[n]);
+				// do not broadcast to the sender itself
+				if (targetNode != NULL && targetNode != &node->queryCore)
+				{
+					handlePlanetaryPacket(targetNode, buf, plen);
+				}
+			}
+		}
+		else
+		{
+			if (p->what == PlanetaryMessage_resultset_tag && node->queryCore.mode == AM_SINK)
+			{
+				// results arrived at the sink
+				sim->lastResultset = p->querySlot->resultset;
+			}
+			else
+			{
+				QueryCore* targetNode = getSimNodeById(sim, p->receivers[p->curPos]);
+				if (targetNode != NULL)
+				{
+					handlePlanetaryPacket(targetNode, buf, plen);
+				}
+			}
+		}
+
+		queueNext(curQueue);
 	}
 }
 
 void advanceSim(NetSim* sim, int ticks)
 {
-	// advance all query cores
-	for (int i = 0; i < sim->nodes_count; i++) {
-		advanceQueryCore(&sim->nodes[i].queryCore, ticks);
-	}
-
-	unsigned char buf[NET_SIM_MAX_PACKET_LEN];
-
-	// send/receive packets
-	for (int i = 0; i < sim->nodes_count; i++) {
-
-		PacketQueue* curQueue = &sim->nodes[i].queryCore.packetQueue;
-
-		while (!queueIsEmpty(curQueue))
-		{
-			// create packet
-			PacketToSend* p = queuePeekHead(curQueue);			
-			int plen = createPlanetaryPacket(&sim->nodes[i].queryCore, p, buf, NET_SIM_MAX_PACKET_LEN);
-			// directly inject the packet to the target node
-			if (p->noOfReceivers == SEND_BROADCAST)
-			{
-				for (int n = 0; n < sim->nodes[i].neighbors_count; n++) {					
-					QueryCore* targetNode = getSimNodeById(sim, sim->nodes[i].neighbors[n]);
-					// do not broadcast to the sender itself
-					if (targetNode != NULL && targetNode != &sim->nodes[i].queryCore)
-					{
-						handlePlanetaryPacket(targetNode, buf, plen);
-					}
-				}				
-			}
-			else
-			{
-				if (p->what == PlanetaryMessage_resultset_tag && sim->nodes[i].queryCore.mode == AM_SINK)
-				{
-					// results arrived at the sink
-					sim->lastResultset = p->querySlot->resultset;
-				}
-				else 
-				{
-					QueryCore* targetNode = getSimNodeById(sim, p->receivers[p->curPos]);
-					if (targetNode != NULL)
-					{
-						handlePlanetaryPacket(targetNode, buf, plen);
-					}
-				}
-			}
-
-			queueNext(curQueue);
+	for (int step = 0; step < ticks; step += 10)
+	{
+		// advance all query cores & handle packet sending/receiving
+		for (int i = 0; i < sim->nodes_count; i++) {
+			advanceQueryCore(&sim->nodes[i].queryCore, 10);
+			processPackets(sim, &sim->nodes[i]);
 		}
 	}
 }

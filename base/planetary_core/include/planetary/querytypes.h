@@ -8,6 +8,8 @@
 #include <planetary/proto/identifier.pb.h>
 #include <planetary/proto/query.pb.h>
 #include <planetary/proto/resultset.pb.h>
+#include <planetary/proto/store.pb.h>
+#include <planetary/stores.h>
 
 enum APPMODE {AM_SINK, AM_NODE};
 
@@ -89,6 +91,7 @@ typedef struct QueryCore_t {
 
 	QuerySlot queries[MAX_RUNNING_QUERIES];
     PacketQueue packetQueue;	
+	struct StoreCollection storeCollection;
 
 	// a user settable value, not used by planetary
 	void* tag;

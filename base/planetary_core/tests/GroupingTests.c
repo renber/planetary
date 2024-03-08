@@ -51,8 +51,9 @@ void Test_CombineResults_Max(CuTest *tc)
 	slot.queryData = emptyQuery;
 	slot.queryData.actions_count++;
 	slot.queryData.actions[0].which_content = ActionType_SELECTOR;
+	slot.queryData.actions[0].content.selector.which_source = TargetType_TARGETSINK;
 	slot.queryData.actions[0].content.selector.type = SelectorType_MAX;	
-	strcpy_s(slot.queryData.actions[0].content.selector.sensorId.name, 9, SENSOR_ID);
+	strcpy_s(slot.queryData.actions[0].content.selector.source.sensor.sensorId.name, 9, SENSOR_ID);
 	
 	// add 3 result rows
 	slot.resultset = emptyResultset;
