@@ -1,12 +1,12 @@
 # ![Planetary logo](https://www.tu-chemnitz.de/~berre/images/planetary_logo_small.png)
 
-Planetary - A queriable aggregation system for Wireless Sensor Networks (WSN)
+# Planetary - A queriable aggregation system for Wireless Sensor Networks (WSN)
 
 This repository contains the implementation of my PhD thesis called "Efficient data aggregation in Big Data Wireless Sensor Networks" - Planetary.
 Planetary is a data aggregation system for Large Scale WSNs which incorporates approaches and algorithms (sketches) from Big Data computing to improve the memory and energy efficiency and thus lifespan
 of wireless sensor network applications.
 
-# References
+## References
 
 René Bergelt  
 "An Energy-aware Ad-hoc Routing Strategy for Queriable Wireless Sensor Networks"  
